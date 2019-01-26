@@ -15,6 +15,8 @@ chercher_1_svc(Chaine *argp, struct svc_req *rqstp)
 	/*
 	 * insert server code here
 	 */
+    
+    
 
 	return(&result);
 }
