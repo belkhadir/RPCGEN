@@ -11,25 +11,76 @@ chercher_1_svc(Chaine *argp, struct svc_req *rqstp)
 {
 
 	static int  result;
-
-	/*
-	 * insert server code here
-	 */
+    /*
+     * insert server code here
+     */
     
+    FILE *fp;
+    char buff[255];
+	
+    fp = fopen("/tmp/file.txt", "r");
+    if(fp == NULL){
+        perror("file errpr");
+        exit(-1);
+    }
+    int line = 0;
+    int index = 0;
+    while(fgets(buff, 255, (FILE*)fp) != NULL) {
+        line = strlent(buff);   /* the sie of buff   */
+        buff[line-1] = '\0' ; /* the end of the line   */
+        if(strcmp(argp->car, buff) == 0) {
+            result = index;
+            fclose(fp);
+            return(&result);
+        }
+        index +=1;
+    }
     
-
+    result = -1;
+    
+    fclose(fp);
 	return(&result);
 }
 
 int *
 supprimer_1_svc(Chaine *argp, struct svc_req *rqstp)
 {
-
 	static int  result;
-
-	/*
-	 * insert server code here
-	 */
-
+    int *line = chercher_1_svc(&argp, &rqstp);
+    
+    if(line == -1) {
+        result = -1;
+    }else {
+        FILE *fp, *fp2;;
+        char buff[255];
+        
+        fp = fopen("/tmp/file.txt", "r");
+        if(fp == NULL){
+            perror("file errpr");
+            exit(-1);
+        }
+        
+        fp2 = fopen("/tmp/temp.txt", "w");
+        if(fp2 == NULL){
+            perror("file errpr");
+            exit(-1);
+        }
+        
+        while(fgets(buff, 255, (FILE*)fp) != NULL) {
+            line = strlent(buff);   /* the sie of buff   */
+            buff[line-1] = '\0' ; /* the end of the line   */
+            if(strcmp(argp->car, buff) != 0) {
+                buff[line-1] = '\n';
+                fputs(buff, fp2);
+            }
+        }
+        
+        fclose(fp);
+        fclose(fp2);
+        remove("/tmp/file.txt");
+        rename("/tmp/temp.txt", "/tmp/file.txt");
+        result = 0;
+    }
+    
 	return(&result);
 }
